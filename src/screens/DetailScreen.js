@@ -1,16 +1,10 @@
 import React from 'react';
-import {
-  StyleSheet,
-  ScrollView,
-  View,
-  Text,
-  ActivityIndicator,
-  Image,
-  TouchableOpacity,
-} from 'react-native';
+import {ScrollView, View, Text, Image, TouchableOpacity} from 'react-native';
 import {Icon} from 'react-native-elements';
 import FontAwesome5Icon from 'react-native-vector-icons/FontAwesome5';
-import {useNetInfo} from '@react-native-community/netinfo';
+import NetInfo from '@react-native-community/netinfo';
+import AsyncStorage from '@react-native-community/async-storage';
+
 import Api from '../Api/Apis';
 import {Dimens} from '../Utils/Theme';
 import * as Animatiable from 'react-native-animatable';
@@ -21,6 +15,7 @@ import TipView from '../Component/TipView';
 import FooterComponent from '../Component/FooterComponent';
 import SubCategoryComponent from '../Component/SubCategoryComponent';
 import styles from './DetailScreenStyles';
+import LoaderComponent from '../Component/LoaderComponent';
 
 class DetailScreen extends React.Component {
   state = {
@@ -31,21 +26,51 @@ class DetailScreen extends React.Component {
   };
 
   componentDidMount() {
-    // if (netInfo.isConnected) {
-    Api.getCall(
-      Api.webService.fetchFoodList,
-      (data) => {
-        this.setState({
-          foodList: data.categories,
-          filterFoodList: data.categories,
-        });
-      },
-      (error) => {
-        console.log(error);
-      },
-    );
-    // }
+    NetInfo.fetch().then((state) => {
+      if (!state.isConnected) {
+        this.getDataFromLocalStorage();
+        return;
+      }
+      this.setState({isLoading: true}, () => {
+        Api.getCall(
+          Api.webService.fetchFoodList,
+          async (data) => {
+            await AsyncStorage.setItem(
+              'FOOD_CATEGORIES',
+              JSON.stringify(data.categories),
+            );
+            this.setState({
+              foodList: data.categories,
+              filterFoodList: data.categories,
+              isLoading: false,
+            });
+          },
+          (error) => {
+            this.setState(
+              {
+                isLoading: false,
+              },
+              () => console.log(error),
+            );
+          },
+        );
+      });
+    });
   }
+
+  getDataFromLocalStorage = async () => {
+    try {
+      const value = await AsyncStorage.getItem('FOOD_CATEGORIES');
+      if (value !== null) {
+        this.setState({
+          foodList: JSON.parse(value),
+          filterFoodList: JSON.parse(value),
+        });
+      }
+    } catch (e) {
+      console.log(e);
+    }
+  };
 
   updateIndex = (index) => {
     let tempIndex = [...this.state.selectedIndex];
@@ -58,9 +83,7 @@ class DetailScreen extends React.Component {
     } else {
       tempIndex.push(index);
     }
-    this.setState({selectedIndex: tempIndex}, () =>
-      console.log(this.state.selectedIndex),
-    );
+    this.setState({selectedIndex: tempIndex});
   };
 
   _renderBarHeader = (obj, index) => {
@@ -101,9 +124,10 @@ class DetailScreen extends React.Component {
   _renderContent = (obj) => {
     return (
       <Animatiable.View animation={'slideInDown'} duration={500}>
-        {obj.subcategories.map((categoryObj) => {
+        {obj.subcategories.map((categoryObj, index) => {
           return (
             <SubCategoryComponent
+              key={index}
               headerText={categoryObj.subCategoryname}
               headerColor={{color: obj.colorCode}}
               childenArr={categoryObj.items}
@@ -140,7 +164,7 @@ class DetailScreen extends React.Component {
       <View style={styles.PageHeaderContainer}>
         <TouchableOpacity
           style={styles.closeButtonContainer}
-          onPress={() => {}}>
+          onPress={() => this.props.navigation.goBack()}>
           <Icon
             name="close"
             size={Dimens.fourty}
@@ -155,22 +179,35 @@ class DetailScreen extends React.Component {
   };
 
   searchList = (keyWord) => {
-    let foodListAvailable = {...this.state.foodList};
+    let foodListAvailable = [...this.state.foodList];
 
     if (keyWord == '') {
       this.setState({filterFoodList: foodListAvailable});
       return;
     }
 
-    let abc = foodListAvailable.category.subcategories.map((subObj) => {
-      subObj.items.filter((item) => {
-        if (item.indexOf(keyWord) !== -1) {
-          return item;
-        }
+    let searchedArray = foodListAvailable.map((foodObj) => {
+      return foodObj.category.subcategories.map((item) => {
+        return item.items.filter((itemm) => {
+          if (itemm.toUpperCase().indexOf(keyWord.toUpperCase()) !== -1)
+            return itemm;
+        });
       });
     });
+    console.log(searchedArray);
+
+    let abc = foodListAvailable.map((foodObj) => {
+      return {
+        ...foodObj.category.subcategories,
+        items: searchedArray,
+      };
+    });
+
     console.log(abc);
-    this.setState({filterFoodList: abc});
+
+    // this.setState({
+    //   filterFoodList: abc,
+    // });
   };
 
   _renderMainView = () => {
@@ -184,7 +221,6 @@ class DetailScreen extends React.Component {
             paddingBottom: Dimens.ten,
           }}>
           {this._renderPageHeader()}
-
           <SearchComponent
             updateSearch={(keyWord) => {
               this.searchList(keyWord);
@@ -193,7 +229,6 @@ class DetailScreen extends React.Component {
 
           {filterFoodList.length > 0 &&
             filterFoodList.map((obj, index) => {
-              console.log(obj);
               return this._renderBar(obj.category, index);
             })}
         </ScrollView>
@@ -210,28 +245,13 @@ class DetailScreen extends React.Component {
     );
   };
 
-  _renderLoader = () => {
-    return (
-      <View
-        style={{
-          flex: 1,
-          backgroundColor: 'rgba(0,0,0,0.1)',
-          justifyContent: 'center',
-        }}>
-        <ActivityIndicator color={'red'} size={'large'} />
-      </View>
-    );
-  };
-
   render() {
     const {isLoading} = this.state;
-
     return (
-      <>
-        <View style={[styles.container, {backgroundColor: 'rgba(0,0,0,0.2)'}]}>
-          {isLoading ? this._renderLoader() : this._renderMainView()}
-        </View>
-      </>
+      <View style={[styles.container, {backgroundColor: 'rgba(0,0,0,0.2)'}]}>
+        {this._renderMainView()}
+        {isLoading && <LoaderComponent loadingText={'Please wait...!'} />}
+      </View>
     );
   }
 }

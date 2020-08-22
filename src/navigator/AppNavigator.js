@@ -18,7 +18,7 @@ const App = () => {
           options={{
             title: 'Home Screen',
             headerStyle: {
-              backgroundColor: '#192f6a',
+              backgroundColor: 'rgba(0,0,0,0.2)',
             },
             headerTintColor: '#fff',
             headerTitleStyle: {
