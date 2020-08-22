@@ -25,8 +25,8 @@ import styles from './DetailScreenStyles';
 class DetailScreen extends React.Component {
   state = {
     isLoading: false,
-    foodList: {categories: []},
-    filterFoodList: {categories: []},
+    foodList: [],
+    filterFoodList: [],
     selectedIndex: [-1],
   };
 
@@ -35,7 +35,10 @@ class DetailScreen extends React.Component {
     Api.getCall(
       Api.webService.fetchFoodList,
       (data) => {
-        this.setState({foodList: data, filterFoodList: data});
+        this.setState({
+          foodList: data.categories,
+          filterFoodList: data.categories,
+        });
       },
       (error) => {
         console.log(error);
@@ -95,7 +98,7 @@ class DetailScreen extends React.Component {
     );
   };
 
-  _renderContent = (obj, index) => {
+  _renderContent = (obj) => {
     return (
       <Animatiable.View animation={'slideInDown'} duration={500}>
         {obj.subcategories.map((categoryObj) => {
@@ -118,14 +121,12 @@ class DetailScreen extends React.Component {
     const {selectedIndex} = this.state;
     return (
       <>
-        <Animatiable.View
-          animation={'slideInDown'}
-          duration={500}
+        <View
           key={index}
           style={[styles.barContainer, {marginTop: Dimens.fifteen}]}>
           {this._renderBarHeader(obj, index)}
-          {selectedIndex.includes(index) && this._renderContent(obj, index)}
-        </Animatiable.View>
+          {selectedIndex.includes(index) && this._renderContent(obj)}
+        </View>
 
         {selectedIndex.includes(index) && obj.protip != '' && (
           <TipView proTip={obj.protip} />
@@ -161,13 +162,11 @@ class DetailScreen extends React.Component {
       return;
     }
 
-    let abc = foodListAvailable.categories.map((obj) => {
-      obj.category.subcategories.filter((subObj) => {
-        subObj.items.filter((item) => {
-          if (item.indexOf(keyWord) !== -1) {
-            return item;
-          }
-        });
+    let abc = foodListAvailable.category.subcategories.map((subObj) => {
+      subObj.items.filter((item) => {
+        if (item.indexOf(keyWord) !== -1) {
+          return item;
+        }
       });
     });
     console.log(abc);
@@ -192,8 +191,8 @@ class DetailScreen extends React.Component {
             }}
           />
 
-          {filterFoodList.categories.length > 0 &&
-            filterFoodList.categories.map((obj, index) => {
+          {filterFoodList.length > 0 &&
+            filterFoodList.map((obj, index) => {
               console.log(obj);
               return this._renderBar(obj.category, index);
             })}
