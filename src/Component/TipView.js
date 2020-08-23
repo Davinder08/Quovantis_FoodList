@@ -25,7 +25,6 @@ const styles = StyleSheet.create({
   gradientConatiner: {
     borderRadius: Dimens.ten,
     marginTop: Dimens.fifteen,
-    marginHorizontal: Dimens.ten,
   },
   mainContainer: {
     borderRadius: Dimens.ten,

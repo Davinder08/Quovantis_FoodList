@@ -58,6 +58,7 @@ export default StyleSheet.create({
     alignItems: 'center',
     backgroundColor: 'white',
     justifyContent: 'space-between',
+    marginTop: Dimens.fifteen,
   },
   leftChildContainer: {
     flexDirection: 'row',
@@ -77,8 +78,6 @@ export default StyleSheet.create({
   barContainer: {
     flex: 1,
     marginHorizontal: Dimens.ten,
-    backgroundColor: 'white',
-    borderRadius: Dimens.five,
     overflow: 'hidden',
   },
   noItemContainer: {
