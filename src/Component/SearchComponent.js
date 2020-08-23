@@ -8,7 +8,7 @@ export default SearchComponent = React.memo((props) => {
     <View style={styles.container}>
       <Icon name="search" size={Dimens.thirty} type="Fontisto" color="black" />
       <TextInput
-        placeholder={'Try searching fat, Sauces, names ...'}
+        placeholder={'Try searching fat, sauces, names ...'}
         style={styles.textInputStyling}
         onChangeText={(text) => props.updateSearch(text)}
       />
@@ -31,6 +31,8 @@ const styles = StyleSheet.create({
     backgroundColor: '#cccccc',
     borderRadius: Dimens.ten,
     padding: Dimens.tweleve,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   textInputStyling: {
     flex: 1,

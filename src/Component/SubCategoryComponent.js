@@ -1,5 +1,5 @@
 import React from 'react';
-import {View, Text, FlatList, StyleSheet} from 'react-native';
+import {View, Text, StyleSheet} from 'react-native';
 import {Dimens} from '../Utils/Theme';
 
 export default SubCategoriesComponent = React.memo((props) => {
@@ -16,7 +16,15 @@ export default SubCategoriesComponent = React.memo((props) => {
   };
 
   return (
-    <View style={styles.gradientConatiner}>
+    <View
+      key={props.index}
+      style={[
+        styles.gradientConatiner,
+        props.isActive && {
+          borderBottomLeftRadius: 5,
+          borderBottomRightRadius: 5,
+        },
+      ]}>
       {props.headerText != '' && (
         <Text
           style={[styles.textTipStyling, props.headerColor]}

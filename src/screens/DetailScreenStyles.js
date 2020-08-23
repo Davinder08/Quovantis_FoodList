@@ -6,6 +6,7 @@ const {height} = Dimensions.get('window');
 export default StyleSheet.create({
   container: {
     flex: 1,
+    
   },
   item: {
     backgroundColor: '#f9c2ff',
@@ -89,5 +90,14 @@ export default StyleSheet.create({
   noItemTextStyle: {
     fontSize: Dimens.twenty,
     color: 'black',
+  },
+  gradientConatiner: {
+    flex: 1,
+    backgroundColor: 'white',
+  },
+
+  textTipStyling: {
+    fontSize: Dimens.eighteen,
+    padding: Dimens.ten,
   },
 });

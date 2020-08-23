@@ -1,5 +1,13 @@
 import React from 'react';
-import {ScrollView, View, Text, Image, TouchableOpacity} from 'react-native';
+import {
+  ScrollView,
+  View,
+  Text,
+  Image,
+  TouchableOpacity,
+  SectionList,
+  StyleSheet,
+} from 'react-native';
 import {Icon} from 'react-native-elements';
 import FontAwesome5Icon from 'react-native-vector-icons/FontAwesome5';
 import NetInfo from '@react-native-community/netinfo';
@@ -136,8 +144,44 @@ class DetailScreen extends React.Component {
     );
   };
 
+  // renderItem = ({item}) => {
+  //   return (
+  //     <View>
+  //       <Text style={styles.textTipStyling} children={item.item} />
+  //       <View
+  //         style={{
+  //           width: '100%',
+  //           height: StyleSheet.hairlineWidth,
+  //           backgroundColor: 'silver',
+  //         }}
+  //       />
+  //     </View>
+  //   );
+  // };
+
+  // renderSectionHeader = ({section}) => {
+  //   if (section.title == '') {
+  //     return null;
+  //   }
+  //   return (
+  //     <Text
+  //       style={[styles.textTipStyling, section.color]}
+  //       children={section.title}
+  //     />
+  //   );
+  // };
+
   _renderContent = (section, isActive) => {
     let obj = section.category;
+    // let array = obj.subcategories.map((item, index) => {
+    //   return {
+    //     id: index,
+    //     title: item.subCategoryname,
+    //     data: item.items,
+    //     color: obj.colorCode,
+    //   };
+    // });
+
     return (
       <Animatiable.View
         animation={'slideInUp'}
@@ -146,10 +190,18 @@ class DetailScreen extends React.Component {
           styles.barContainer,
           isActive && {borderBottomLeftRadius: 5, borderBottomRightRadius: 5},
         ]}>
+        {/* <SectionList
+          style={[styles.container, {backgroundColor: 'white'}]}
+          sections={array}
+          renderItem={this.renderItem}
+          renderSectionHeader={this.renderSectionHeader}
+          keyExtractor={(item, index) => index}
+        /> */}
         {obj.subcategories.map((categoryObj, index) => {
           return (
             <SubCategoryComponent
-              key={index}
+              index={index}
+              isActive={isActive}
               headerText={categoryObj.subCategoryname}
               headerColor={{color: obj.colorCode}}
               childenArr={categoryObj.items}
@@ -157,7 +209,6 @@ class DetailScreen extends React.Component {
             />
           );
         })}
-
         {obj.quote != '' && (
           <FooterComponent
             dynamicStyle={
