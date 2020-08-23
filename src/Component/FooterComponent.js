@@ -5,7 +5,7 @@ import {Dimens} from '../Utils/Theme';
 
 export default FooterComponent = React.memo((props) => {
   return (
-    <View style={styles.gradientConatiner}>
+    <View style={[styles.gradientConatiner, props.dynamicStyle]}>
       <View
         style={{
           overflow: 'hidden',

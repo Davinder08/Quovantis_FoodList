@@ -4,6 +4,7 @@ import {Icon} from 'react-native-elements';
 import FontAwesome5Icon from 'react-native-vector-icons/FontAwesome5';
 import NetInfo from '@react-native-community/netinfo';
 import AsyncStorage from '@react-native-community/async-storage';
+import Accordion from 'react-native-collapsible/Accordion';
 
 import Api from '../Api/Apis';
 import {Dimens} from '../Utils/Theme';
@@ -95,13 +96,18 @@ class DetailScreen extends React.Component {
     this.setState({selectedIndex: tempIndex});
   };
 
-  _renderBarHeader = (obj, index) => {
-    const {selectedIndex} = this.state;
+  _renderBarHeader = (section, index, isActive) => {
+    let obj = section.category;
     return (
       <TouchableOpacity
         activeOpacity={0.9}
         onPress={() => this.updateIndex(index)}
-        style={styles.categoryHeader}>
+        style={[
+          styles.categoryHeader,
+          styles.barContainer,
+          {borderTopLeftRadius: 5, borderTopRightRadius: 5},
+          !isActive && {borderRadius: 5},
+        ]}>
         <View style={styles.leftChildContainer}>
           <Image
             style={styles.categoryImageStyle}
@@ -122,7 +128,7 @@ class DetailScreen extends React.Component {
         </View>
         <FontAwesome5Icon
           style={{marginHorizontal: Dimens.five}}
-          name={selectedIndex.includes(index) ? 'caret-up' : 'caret-down'}
+          name={isActive ? 'caret-up' : 'caret-down'}
           size={Dimens.thirty}
           color="silver"
         />
@@ -130,9 +136,16 @@ class DetailScreen extends React.Component {
     );
   };
 
-  _renderContent = (obj) => {
+  _renderContent = (section, isActive) => {
+    let obj = section.category;
     return (
-      <Animatiable.View animation={'slideInDown'} duration={500}>
+      <Animatiable.View
+        animation={'slideInUp'}
+        duration={400}
+        style={[
+          styles.barContainer,
+          isActive && {borderBottomLeftRadius: 5, borderBottomRightRadius: 5},
+        ]}>
         {obj.subcategories.map((categoryObj, index) => {
           return (
             <SubCategoryComponent
@@ -145,26 +158,19 @@ class DetailScreen extends React.Component {
           );
         })}
 
-        {obj.quote != '' && <FooterComponent quotes={obj.quote} />}
-      </Animatiable.View>
-    );
-  };
-
-  _renderBar = (obj, index) => {
-    const {selectedIndex} = this.state;
-    return (
-      <>
-        <View
-          key={index}
-          style={[styles.barContainer, {marginTop: Dimens.fifteen}]}>
-          {this._renderBarHeader(obj, index)}
-          {selectedIndex.includes(index) && this._renderContent(obj)}
-        </View>
-
-        {selectedIndex.includes(index) && obj.protip != '' && (
-          <TipView proTip={obj.protip} />
+        {obj.quote != '' && (
+          <FooterComponent
+            dynamicStyle={
+              isActive && {
+                borderBottomLeftRadius: 5,
+                borderBottomRightRadius: 5,
+              }
+            }
+            quotes={obj.quote}
+          />
         )}
-      </>
+        {obj.protip != '' && <TipView proTip={obj.protip} />}
+      </Animatiable.View>
     );
   };
 
@@ -211,10 +217,20 @@ class DetailScreen extends React.Component {
     this.setState({filterFoodList: abc});
   };
 
-  _renderFoodList = () => {
-    return filterFoodList.map((obj, index) => {
-      return this._renderBar(obj.category, index);
-    });
+  _renderFoodList = (filterFoodList) => {
+    const {selectedIndex} = this.state;
+    return (
+      <Accordion
+        activeSections={selectedIndex}
+        sections={filterFoodList}
+        touchableComponent={TouchableOpacity}
+        expandMultiple={true}
+        renderHeader={this._renderBarHeader}
+        renderContent={this._renderContent}
+        duration={400}
+        onChange={this.updateIndex}
+      />
+    );
   };
 
   _renderEmptyView = () => {
@@ -236,6 +252,7 @@ class DetailScreen extends React.Component {
             paddingBottom: Dimens.ten,
           }}>
           {this._renderPageHeader()}
+
           <SearchComponent
             updateSearch={(keyWord) => {
               this.searchList(keyWord);
