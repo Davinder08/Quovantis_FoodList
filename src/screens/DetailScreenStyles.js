@@ -1,5 +1,7 @@
-import {StyleSheet} from 'react-native';
+import {StyleSheet, Dimensions} from 'react-native';
 import {Dimens, Colors} from '../Utils/Theme';
+
+const {height} = Dimensions.get('window');
 
 export default StyleSheet.create({
   container: {
@@ -78,5 +80,15 @@ export default StyleSheet.create({
     backgroundColor: 'white',
     borderRadius: Dimens.five,
     overflow: 'hidden',
+  },
+  noItemContainer: {
+    flex: 1,
+    height: height / 2,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  noItemTextStyle: {
+    fontSize: Dimens.twenty,
+    color: 'black',
   },
 });

@@ -35,6 +35,15 @@ class DetailScreen extends React.Component {
         Api.getCall(
           Api.webService.fetchFoodList,
           async (data) => {
+            if (!data.success) {
+              this.setState({
+                foodList: [],
+                filterFoodList: [],
+                isLoading: false,
+              });
+              return;
+            }
+
             await AsyncStorage.setItem(
               'FOOD_CATEGORIES',
               JSON.stringify(data.categories),
@@ -187,27 +196,33 @@ class DetailScreen extends React.Component {
     }
 
     let searchedArray = foodListAvailable.map((foodObj) => {
-      return foodObj.category.subcategories.map((item) => {
+      return foodObj.category.subcategories.filter((item) => {
         return item.items.filter((itemm) => {
           if (itemm.toUpperCase().indexOf(keyWord.toUpperCase()) !== -1)
             return itemm;
         });
       });
     });
+
     console.log(searchedArray);
 
-    let abc = foodListAvailable.map((foodObj) => {
-      return {
-        ...foodObj.category.subcategories,
-        items: searchedArray,
-      };
+    let abc = {...filterFoodList.category.subcategories, items: searchedArray};
+
+    this.setState({filterFoodList: abc});
+  };
+
+  _renderFoodList = () => {
+    return filterFoodList.map((obj, index) => {
+      return this._renderBar(obj.category, index);
     });
+  };
 
-    console.log(abc);
-
-    // this.setState({
-    //   filterFoodList: abc,
-    // });
+  _renderEmptyView = () => {
+    return (
+      <View style={styles.noItemContainer}>
+        <Text style={styles.noItemTextStyle} children={'No Data Available'} />
+      </View>
+    );
   };
 
   _renderMainView = () => {
@@ -227,10 +242,9 @@ class DetailScreen extends React.Component {
             }}
           />
 
-          {filterFoodList.length > 0 &&
-            filterFoodList.map((obj, index) => {
-              return this._renderBar(obj.category, index);
-            })}
+          {filterFoodList.length > 0
+            ? this._renderFoodList(filterFoodList)
+            : this._renderEmptyView()}
         </ScrollView>
 
         <TouchableOpacity style={styles.messageIconContainer}>
