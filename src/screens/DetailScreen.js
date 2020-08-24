@@ -25,7 +25,6 @@ import FooterComponent from '../Component/FooterComponent';
 import SubCategoryComponent from '../Component/SubCategoryComponent';
 import styles from './DetailScreenStyles';
 import LoaderComponent from '../Component/LoaderComponent';
-import data from './data.json';
 
 class DetailScreen extends React.Component {
   state = {
