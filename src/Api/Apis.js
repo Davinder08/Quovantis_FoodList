@@ -12,17 +12,18 @@ const webService = {
 };
 
 const getCall = (Api, success, faliure) => {
+  console.log(Api);
   return fetch(Api, {
     method: GET,
     headers: HEADER,
   })
     .then((response) => response.json())
     .then((responseJson) => {
-      success(responseJson);
+      return success(responseJson);
     })
     .catch((error) => {
       console.log(error);
-      faliure(error);
+      return faliure(error);
     });
 };
 

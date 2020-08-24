@@ -25,6 +25,7 @@ import FooterComponent from '../Component/FooterComponent';
 import SubCategoryComponent from '../Component/SubCategoryComponent';
 import styles from './DetailScreenStyles';
 import LoaderComponent from '../Component/LoaderComponent';
+import data from './data.json';
 
 class DetailScreen extends React.Component {
   state = {
@@ -44,19 +45,11 @@ class DetailScreen extends React.Component {
         Api.getCall(
           Api.webService.fetchFoodList,
           async (data) => {
-            if (!data.success) {
-              this.setState({
-                foodList: [],
-                filterFoodList: [],
-                isLoading: false,
-              });
-              return;
-            }
-
             await AsyncStorage.setItem(
               'FOOD_CATEGORIES',
               JSON.stringify(data.categories),
             );
+
             this.setState({
               foodList: data.categories,
               filterFoodList: data.categories,
@@ -64,12 +57,10 @@ class DetailScreen extends React.Component {
             });
           },
           (error) => {
-            this.setState(
-              {
-                isLoading: false,
-              },
-              () => console.log(error),
-            );
+            console.log(error);
+            this.setState({
+              isLoading: false,
+            });
           },
         );
       });
@@ -252,20 +243,27 @@ class DetailScreen extends React.Component {
       return;
     }
 
-    let searchedArray = foodListAvailable.map((foodObj) => {
-      return foodObj.category.subcategories.filter((item) => {
-        return item.items.filter((itemm) => {
-          if (itemm.toUpperCase().indexOf(keyWord.toUpperCase()) !== -1)
+    let searchedArray = foodListAvailable.filter((foodObj) => {
+      return foodObj.category.subcategories.some((item) => {
+        return item.items.some((itemm) => {
+          if (itemm.toUpperCase().indexOf(keyWord.toUpperCase()) !== -1) {
             return itemm;
+          }
         });
       });
     });
 
-    console.log(searchedArray);
+    // console.log(searchedArray);
+    // console.log(foodListAvailable1);
 
-    let abc = {...filterFoodList.category.subcategories, items: searchedArray};
+    // let abc = {
+    //   ...foodListAvailable1.category.subcategories[0],
+    //   items: searchedArray,
+    // };
 
-    this.setState({filterFoodList: abc});
+    // console.log(abc);
+
+    this.setState({filterFoodList: searchedArray});
   };
 
   _renderFoodList = (filterFoodList) => {
