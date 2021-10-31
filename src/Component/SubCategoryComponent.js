@@ -3,17 +3,17 @@ import {View, Text, StyleSheet} from 'react-native';
 import {Dimens} from '../Utils/Theme';
 
 export default SubCategoriesComponent = React.memo((props) => {
-  const _itemSeperator = (item) => {
-    return (
-      <View
-        style={{
-          width: '100%',
-          height: StyleSheet.hairlineWidth,
-          backgroundColor: 'silver',
-        }}
-      />
-    );
-  };
+  // const _itemSeperator = (item) => {
+  //   return (
+  //     <View
+  //       style={{
+  //         width: '100%',
+  //         height: StyleSheet.hairlineWidth,
+  //         backgroundColor: 'silver',
+  //       }}
+  //     />
+  //   );
+  // };
 
   return (
     <View
@@ -39,7 +39,7 @@ export default SubCategoriesComponent = React.memo((props) => {
         renderItem={(item) => { */}
       {props.childenArr.map((item, index) => {
         return (
-          <View index={index}>
+          <View key={index} index={index}>
             <Text style={styles.textTipStyling} children={item} />
             <View
               style={{

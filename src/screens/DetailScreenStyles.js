@@ -6,7 +6,6 @@ const {height} = Dimensions.get('window');
 export default StyleSheet.create({
   container: {
     flex: 1,
-    
   },
   item: {
     backgroundColor: '#f9c2ff',
@@ -99,5 +98,9 @@ export default StyleSheet.create({
   textTipStyling: {
     fontSize: Dimens.eighteen,
     padding: Dimens.ten,
+  },
+  barBorder: {
+    borderBottomLeftRadius: 5,
+    borderBottomRightRadius: 5,
   },
 });

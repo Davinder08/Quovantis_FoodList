@@ -1,6 +1,5 @@
 import React from 'react';
 import {View, Text, StyleSheet} from 'react-native';
-import {Icon} from 'react-native-elements';
 import {Dimens} from '../Utils/Theme';
 
 export default FooterComponent = React.memo((props) => {

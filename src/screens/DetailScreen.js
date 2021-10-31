@@ -1,22 +1,14 @@
 import React from 'react';
-import {
-  ScrollView,
-  View,
-  Text,
-  Image,
-  TouchableOpacity,
-  SectionList,
-  StyleSheet,
-} from 'react-native';
+import {ScrollView, View, Text, Image, TouchableOpacity} from 'react-native';
 import {Icon} from 'react-native-elements';
 import FontAwesome5Icon from 'react-native-vector-icons/FontAwesome5';
 import NetInfo from '@react-native-community/netinfo';
 import AsyncStorage from '@react-native-community/async-storage';
 import Accordion from 'react-native-collapsible/Accordion';
+import * as Animatiable from 'react-native-animatable';
 
 import Api from '../Api/Apis';
 import {Dimens} from '../Utils/Theme';
-import * as Animatiable from 'react-native-animatable';
 
 // File imports
 import SearchComponent from '../Component/SearchComponent';
@@ -26,44 +18,47 @@ import SubCategoryComponent from '../Component/SubCategoryComponent';
 import styles from './DetailScreenStyles';
 import LoaderComponent from '../Component/LoaderComponent';
 
+const data = require('./data.json');
+
 class DetailScreen extends React.Component {
   state = {
     isLoading: false,
     foodList: [],
-    filterFoodList: [],
+    filterFoodList: data || [],
     selectedIndex: [-1],
   };
 
   componentDidMount() {
-    NetInfo.fetch().then((state) => {
-      if (!state.isConnected) {
-        this.getDataFromLocalStorage();
-        return;
-      }
-      this.setState({isLoading: true}, () => {
-        Api.getCall(
-          Api.webService.fetchFoodList,
-          async (data) => {
-            await AsyncStorage.setItem(
-              'FOOD_CATEGORIES',
-              JSON.stringify(data.categories),
-            );
+    console.log(data);
 
-            this.setState({
-              foodList: data.categories,
-              filterFoodList: data.categories,
-              isLoading: false,
-            });
-          },
-          (error) => {
-            console.log(error);
-            this.setState({
-              isLoading: false,
-            });
-          },
-        );
-      });
-    });
+    // NetInfo.fetch().then((state) => {
+    //   if (!state.isConnected) {
+    //     this.getDataFromLocalStorage();
+    //     return;
+    //   }
+    //   this.setState({isLoading: true}, () => {
+    //     Api.getCall(
+    //       Api.webService.fetchFoodList,
+    //       async (data) => {
+    //         await AsyncStorage.setItem(
+    //           'FOOD_CATEGORIES',
+    //           JSON.stringify(data.categories),
+    //         );
+    //         this.setState({
+    //           foodList: data.categories,
+    //           filterFoodList: data.categories,
+    //           isLoading: false,
+    //         });
+    //       },
+    //       (error) => {
+    //         console.log(error);
+    //         this.setState({
+    //           isLoading: false,
+    //         });
+    //       },
+    //     );
+    //   });
+    // });
   }
 
   getDataFromLocalStorage = async () => {
@@ -83,7 +78,7 @@ class DetailScreen extends React.Component {
   updateIndex = (index) => {
     let tempIndex = [...this.state.selectedIndex];
     let foundIndex = tempIndex.findIndex((obj) => {
-      return obj == index;
+      return obj === index;
     });
 
     if (foundIndex > -1) {
@@ -176,10 +171,7 @@ class DetailScreen extends React.Component {
       <Animatiable.View
         animation={'slideInUp'}
         duration={400}
-        style={[
-          styles.barContainer,
-          isActive && {borderBottomLeftRadius: 5, borderBottomRightRadius: 5},
-        ]}>
+        style={[styles.barContainer, isActive && styles.barBorder]}>
         {/* <SectionList
           style={[styles.container, {backgroundColor: 'white'}]}
           sections={array}
@@ -190,6 +182,7 @@ class DetailScreen extends React.Component {
         {obj.subcategories.map((categoryObj, index) => {
           return (
             <SubCategoryComponent
+              key={index}
               index={index}
               isActive={isActive}
               headerText={categoryObj.subCategoryname}
@@ -251,16 +244,6 @@ class DetailScreen extends React.Component {
         });
       });
     });
-
-    // console.log(searchedArray);
-    // console.log(foodListAvailable1);
-
-    // let abc = {
-    //   ...foodListAvailable1.category.subcategories[0],
-    //   items: searchedArray,
-    // };
-
-    // console.log(abc);
 
     this.setState({filterFoodList: searchedArray});
   };

@@ -1,5 +1,5 @@
 //Api Methods
-const POST = 'POST';
+// const POST = 'POST';
 const GET = 'GET';
 const HEADER = {
   'Content-Type': 'application/json',
